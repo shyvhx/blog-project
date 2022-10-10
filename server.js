@@ -1,6 +1,8 @@
 const express = require('express')
 const articleRouter = require('./routes/articles')
 const app = express()
+const Article = require('./models/article')
+const methodOverride = require('method-override')
 
 const mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/blog')
@@ -8,24 +10,15 @@ mongoose.connect('mongodb://localhost/blog')
 
 app.set('view engine','ejs')
 app.use(express.urlencoded({ extended: false }))
+app.use(methodOverride('_method'))
 
 
 
 
 
-app.get('/', (req,res) => {
-    const articles= [{
-        title: 'Test article',
-        createdAt: new Date(),
-        description: 'test-description'
-        },{
-        title: 'Test article2',
-        createdAt: new Date(),
-        description: 'test-description2'
-        }]
-
-     
- 
+app.get('/', async (req,res) => {
+    const articles=await Article.find().sort({
+        createdAt: 'desc' })
     
  
     res.render('articles/index', {articles: articles})
